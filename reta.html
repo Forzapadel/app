@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Únete a la Reta — Forza Padel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000; color: #fff;
+      min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .card {
+      background: #111; border-radius: 24px; padding: 40px 32px;
+      max-width: 380px; width: 100%; text-align: center; border: 1px solid #222;
+    }
+    .logo { font-size: 48px; margin-bottom: 16px; }
+    h1 { font-size: 24px; font-weight: 800; color: #0b59d5; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #666; margin-bottom: 24px; }
+    .info-box {
+      background: #1a1a1a; border-radius: 14px; padding: 20px;
+      margin-bottom: 28px; text-align: left; border: 1px solid #222;
+    }
+    .info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #ccc; }
+    .info-row:last-child { margin-bottom: 0; }
+    .btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; padding: 16px 24px; border-radius: 14px;
+      text-decoration: none; font-size: 16px; font-weight: 700; margin-bottom: 12px;
+      cursor: pointer; border: none; width: 100%;
+    }
+    .btn-primary { background: #0b59d5; color: #fff; }
+    .btn-ios { background: #1a1a1a; color: #fff; border: 1px solid #333 !important; }
+    .btn-android { background: #1a1a1a; color: #fff; border: 1px solid #333 !important; }
+    .divider { height: 1px; background: #222; margin: 20px 0; }
+    .small { font-size: 12px; color: #555; margin-top: 16px; }
+    .download-section { display: none; }
+    .download-section.visible { display: block; }
+    .loading { color: #555; font-size: 14px; }
+    .spots-badge {
+      display: inline-block; background: #EF444420; color: #EF4444;
+      border: 1px solid #EF444440; border-radius: 8px;
+      padding: 4px 12px; font-size: 12px; font-weight: 700;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🎾</div>
+    <h1>¡Únete a la Reta!</h1>
+    <p class="subtitle">Forza Padel — Zona de Retas</p>
+
+    <div class="info-box" id="infoBox">
+      <p class="loading">Cargando información...</p>
+    </div>
+
+    <div id="spotsDiv"></div>
+
+    <a id="openAppBtn" href="#" class="btn btn-primary">
+      📱 Abrir en la App y unirme
+    </a>
+
+    <div class="download-section" id="downloadSection">
+      <div class="divider"></div>
+      <p style="font-size:13px; color:#aaa; margin-bottom:16px;">¿No tienes la app? Descárgala gratis</p>
+      <a href="https://apps.apple.com/app/id6767002951" class="btn btn-ios">🍎 App Store (iPhone)</a>
+      <a href="https://play.google.com/store/apps/details?id=com.cdp.forzapadel" class="btn btn-android">🤖 Google Play (Android)</a>
+    </div>
+
+    <p class="small">Liga de Padel · Hermosillo, Sonora</p>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://qqkelyoavszrzqhuyqoi.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxa2VseW9hdnN6cnpxaHV5cW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0NDMxMzksImV4cCI6MjA5MTAxOTEzOX0.nCYiesHC4jx6xeeEIwLjhweg7FLWBCOl_iHdxgvLEwI';
+
+    const params = new URLSearchParams(window.location.search);
+    const retaId = params.get('id') || '';
+
+    async function loadReta() {
+      try {
+        const resp = await fetch(
+          `${SUPABASE_URL}/rest/v1/retas?id=eq.${retaId}&select=*`,
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+        );
+        const data = await resp.json();
+        const reta = data[0];
+        if (!reta) { document.getElementById('infoBox').innerHTML = '<p style="color:#666">Reta no encontrada.</p>'; return; }
+
+        const fecha = new Date(reta.fecha + 'T00:00:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+        const hora = reta.hora ? reta.hora.slice(0,5) : '—';
+        const jugadores = [reta.player1_id, reta.player2_id, reta.player3_id, reta.player4_id].filter(Boolean).length;
+        const libres = 4 - jugadores;
+
+        document.getElementById('infoBox').innerHTML = `
+          <div class="info-row"><span>📍</span><span>${reta.club || '—'}</span></div>
+          <div class="info-row"><span>🏟️</span><span>${reta.cancha || '—'}</span></div>
+          <div class="info-row"><span>📅</span><span>${fecha}</span></div>
+          <div class="info-row"><span>⏰</span><span>${hora}</span></div>
+          <div class="info-row"><span>🏆</span><span>${reta.categoria || '—'}</span></div>
+          ${reta.formato ? `<div class="info-row"><span>🔄</span><span>${reta.formato}</span></div>` : ''}
+        `;
+
+        if (libres > 0) {
+          document.getElementById('spotsDiv').innerHTML = `<div class="spots-badge">⬜ ${libres} lugar${libres > 1 ? 'es' : ''} disponible${libres > 1 ? 's' : ''}</div>`;
+        }
+
+      } catch(e) {
+        document.getElementById('infoBox').innerHTML = '<p style="color:#666">Error cargando la reta.</p>';
+      }
+    }
+
+    if (retaId) {
+      loadReta();
+      const deepLink = `forza-padel://zona-retas?retaId=${retaId}`;
+      document.getElementById('openAppBtn').href = deepLink;
+
+      document.getElementById('openAppBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = deepLink;
+        setTimeout(function() {
+          document.getElementById('downloadSection').classList.add('visible');
+          document.getElementById('openAppBtn').textContent = '📱 Intentar abrir de nuevo';
+        }, 2000);
+      });
+    } else {
+      document.getElementById('infoBox').innerHTML = '<p style="color:#666">Link inválido.</p>';
+    }
+  </script>
+</body>
+</html>
