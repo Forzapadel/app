@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forza Padel</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #111;
+      border-radius: 24px;
+      padding: 40px 32px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid #222;
+    }
+    .logo { font-size: 48px; margin-bottom: 16px; }
+    h1 { font-size: 26px; font-weight: 800; color: #0b59d5; margin-bottom: 8px; }
+    p { font-size: 15px; color: #aaa; margin-bottom: 32px; line-height: 1.5; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #0b59d5; color: #fff; }
+    .btn-ios { background: #1a1a1a; color: #fff; border: 1px solid #333; }
+    .btn-android { background: #1a1a1a; color: #fff; border: 1px solid #333; }
+    .btn img { width: 24px; height: 24px; }
+    .divider { height: 1px; background: #222; margin: 20px 0; }
+    .open-btn {
+      background: transparent;
+      border: none;
+      color: #0b59d5;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🎾</div>
+    <h1>Forza Padel</h1>
+    <p>La liga de padel de Hermosillo.<br>Únete a la reta en la app.</p>
+
+    <a href="forza-padel://zona-retas" class="btn btn-primary" id="openApp">
+      <span>📱</span> Abrir en la App
+    </a>
+
+    <div class="divider"></div>
+
+    <p style="font-size:13px; margin-bottom:16px;">¿No tienes la app? Descárgala gratis</p>
+
+    <a href="https://apps.apple.com/app/id6767002951" class="btn btn-ios">
+      <span>🍎</span> App Store (iPhone)
+    </a>
+
+    <a href="https://play.google.com/store/apps/details?id=com.cdp.forzapadel" class="btn btn-android">
+      <span>🤖</span> Google Play (Android)
+    </a>
+  </div>
+
+  <script>
+    // Intentar abrir la app automáticamente
+    window.addEventListener('load', function() {
+      const deepLink = 'forza-padel://zona-retas';
+      const start = Date.now();
+      window.location.href = deepLink;
+
+      // Si después de 2s sigue aquí, la app no está instalada
+      setTimeout(function() {
+        if (Date.now() - start < 2500) {
+          // No se abrió la app — mostrar botones de descarga
+          document.getElementById('openApp').style.display = 'none';
+        }
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
